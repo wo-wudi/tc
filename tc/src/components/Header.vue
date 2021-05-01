@@ -24,16 +24,19 @@
 </template>
 <script>
 export default {
-  mounted(){
-    window.addEventListener('scroll',this.scrollChange)
-  },
-  destroyed(){
-    window.removeEventListener('scroll',this.scrollChange)
-  },
   data(){
     return {
       users:0
     }
+  },
+  mounted(){
+    if(!window.localStorage.getItem('user')){
+      this.users=1
+    }
+    window.addEventListener('scroll',this.scrollChange)
+  },
+  destroyed(){
+    window.removeEventListener('scroll',this.scrollChange)
   },
   methods:{
     scrollChange(){
@@ -51,7 +54,6 @@ export default {
         }).then(() => {
           this.users=1
           window.localStorage.removeItem('user')
-          this.$store.state.user=0
         }).catch(()=>{
       })
     },
@@ -61,6 +63,7 @@ export default {
           cancelButtonText: '管理员',
         }).then(() => {
           window.localStorage.removeItem('token')
+          window.localStorage.removeItem('userid')
           this.$router.push('/ulog')
         }).catch(()=>{
           this.$router.push('/alog')

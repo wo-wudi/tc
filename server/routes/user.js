@@ -12,16 +12,12 @@ user.use(cookieParser());
 user.post("/u1/login", (req, res) => {
   let _uname = req.body.uname;
   let _upwd = req.body.upwd;
-  let token = jwt.sign({ user: _uname }, "Fizz", { expiresIn: 60 * 60 });
+  let token = jwt.sign({ user: _uname }, "Fizz", { expiresIn: 60 * 6000 });
   let sql = "select uid,uname from yhq_user where uname=? and upwd=MD5(?)";
   pool.query(sql, [_uname, _upwd], (err, result) => {
     if (err) throw err;
     if (result.length > 0) {
       res.send({ res: result, token });
-      // jwt.verify(token, "Fizz", function (err, data) {
-      //   if (err) console.log(err);
-      //   console.log("解析的数据", data);
-      // });
     } else res.send("0");
   });
 });

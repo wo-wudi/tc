@@ -12,7 +12,7 @@
           <div class="login_reg_head d-flex justify-content-center">
             <span class="text-dark font-weight-bold h3">用户登录</span>
           </div>
-          <div class="my-5">
+          <div class="my-4">
             <div class="tab_login">
               <div class="login_form">
                 <div>
@@ -69,7 +69,7 @@ export default {
     var checkStuPhone = (rule, value, callback) => {
       let phoneRegexp=/^1[3-9]\d{9}$/
       if (!value) {
-        return callback(new Error('学号不能为空'));
+        return callback(new Error('请输入正确的11位手机号'));
       }
       setTimeout(() => {
         if (!phoneRegexp.test(value)) {
@@ -167,6 +167,9 @@ export default {
           let userString=JSON.stringify(res.data.res[0].uname)
           storage.setItem('user',userString)
           this.$store.commit('addUser',res.data.res[0].uname)
+          let userIdString=JSON.stringify(res.data.res[0].uid)
+          storage.setItem('userid',userIdString)
+          this.$store.commit('addUserID',res.data.res[0].uid)
           let tokenString=JSON.stringify(res.data.token)
           storage.setItem('token',tokenString)
           this.$store.commit('addToken',res.data.token)

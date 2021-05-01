@@ -473,7 +473,36 @@
   letter-spacing: 0;
   text-align: center;
 }
-.question {
+.more {
+  margin-left: 40%;
   text-align: center;
+  font-weight: bold;
+  background-color: #f7f7f7;
+  border: 0;
+  border-radius: 6px;
+}
+.more:focus {
+  outline: 0;
+}
+.more img {
+  width: 10%;
+}
+.nomore {
+  margin-left: 40%;
+  text-align: center;
+  font-weight: bold;
+  background-color: #f7f7f7;
+  color: #bfbfbf;
+  border: 0;
+  border-radius: 6px;
+}
+.nomore:focus {
+  outline: 0;
+}
+.nomore img {
+  width: 10%;
+}
+.question {
+  margin-left: 42%;
   font-weight: bold;
 }

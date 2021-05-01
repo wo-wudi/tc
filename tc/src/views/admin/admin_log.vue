@@ -75,16 +75,15 @@ export default {
       this.axios.post("/admin/a1/login",this.qs.stringify(object)).then(res => {
         //将后台传来的值赋值给res
         this.res=res.data
-        console.log(this.res)
         //当登录失败时改变弹窗起始值，使弹窗显示
         if(this.res==0){
           this.dialogVisible=true
         }
         else{
-          // let storage = window.sessionStorage
-          // let userString=JSON.stringify(res.data[0])
-          // storage.setItem('admin',userString)
-          // this.$store.commit('addAdmin',res.data[0])
+          let storage = window.localStorage
+          let adminString=JSON.stringify(this.res.res[0].aname)
+          storage.setItem('admin',adminString)
+          this.$store.commit('addAdmin',this.res.res[0].aname)
           this.$router.push('/ayhq')
         }
       }).catch(e=>{

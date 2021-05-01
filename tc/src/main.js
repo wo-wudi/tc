@@ -4,6 +4,8 @@ import router from "./router";
 import store from "./store";
 import axios from "axios";
 import qs from "qs";
+// import VueSocketIO from "vue-socket.io";
+// import SocketIO from "socket.io-client";
 // 按需引入
 import {
   Button,
@@ -28,11 +30,31 @@ import {
   Submenu,
   MessageBox,
   Message,
+  Option,
+  Select,
+  Radio,
+  RadioGroup,
+  RadioButton,
 } from "element-ui";
 import MyHeader from "./components/Header.vue";
 
+// Vue.use(VueSocketio, "http://127.0.0.1:12321/");
+
+// Vue.use(
+//   new VueSocketio({
+//     debug: true,
+//     connection: SocketIO("http://127.0.0.1:12321"),
+//   })
+// );
+// Vue.use(
+//   new VueSocketIO({
+//     debug: true,
+//     connection: SocketIO("ws://127.0.0.1:12321"),
+//   })
+// );
+
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "http://127.0.0.1:12321";
+axios.defaults.baseURL = "http://localhost:12321";
 Vue.prototype.axios = axios;
 Vue.prototype.qs = qs;
 
@@ -57,6 +79,11 @@ const components = [
   MenuItem,
   MenuItemGroup,
   Submenu,
+  Select,
+  Option,
+  Radio,
+  RadioGroup,
+  RadioButton,
 ];
 components.forEach((component) => {
   Vue.use(component);
@@ -78,7 +105,7 @@ Vue.prototype.$throw = function(error) {
   return errorHandler(error, this);
 };
 Vue.config.warnHandler = function(msg, vm, trace) {
-  console.log(`Warn: ${msg}\nTrace: ${trace}`);
+  console.error(`Warn: ${msg}\nTrace: ${trace}`);
 };
 
 router.beforeEach((to, from, next) => {

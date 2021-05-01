@@ -4,7 +4,7 @@
     <img class="w-100" src="/img/1.png" alt="">
     <div class="m-4"><span class="h4 font-weight-bold">微信支付优惠券<p class="h6 font-weight-light text-muted mt-3">微信支付自动抵扣</p></span></div>
     <div class="row no-gutters">
-      <div v-for="(item,index) in hl" :key="index.hid" class="father col-lg-4 col-sm-12" @click="hlshow(item)">
+      <div v-for="(item,index) in hl" :key="index.hid" class="col-lg-4 col-sm-12">
         <div class="ml-3">
           <div class="yh">
             <div class="yh1"></div>
@@ -99,7 +99,7 @@
           <div class="ch">
             <div class="ch1"></div>
             <div class="ch2"></div>
-            <button>使用优惠</button>
+            <button @click="useyh">使用优惠</button>
           </div>
         </div>
       </div>
@@ -117,11 +117,13 @@
           <div class="ch">
             <div class="ch1"></div>
             <div class="ch2"></div>
-            <button>使用优惠</button>
+            <button @click="useyh">使用优惠</button>
           </div>
         </div>
       </div>
     </div>
+    <button v-show="moredata" @click="more" class="more my-5">获取更多优惠券<br><img src="/img/6.png" alt=""></button>
+    <button v-show="moredata==0" :disabled="true" class="nomore my-5">没有优惠券了<br><img src="/img/7.png" alt=""></button>
     <h1 class="question my-5">常见问题</h1>
     <div class="p-5">
       <div class="mb-1">领券中心优惠券的种类有哪些？</div>
@@ -134,7 +136,7 @@
       <div class="mb-3 text-muted">请致电：1888888888</div>
     </div>
     <!--遮罩层-->
-    <div class="mask" v-show="show">
+    <div class="mask" v-show="show" @click="close">
     </div>
     <!--显示的内容-->
     <div class="login-page" v-show="show==1">
@@ -144,6 +146,17 @@
         <div class="main">
           <div>{{h.hprice}}=<span>{{h.hmoney}}</span></div>
           <div>市场参考价<span>{{h.hrmb}}</span></div>
+        </div>
+        <button @click="close1">领取</button>
+      </div>
+    </div>
+    <div class="login-page" v-show="show==3">
+      <span>恭喜你获得：</span>
+      <div id="move" class="position-relative move">
+        <img src="/img/5.png" alt="">
+        <div class="main">
+          <div>{{h1.hprice}}=<span>{{h1.hmoney}}</span></div>
+          <div>市场参考价<span>{{h1.hrmb}}</span></div>
         </div>
         <button @click="close">领取</button>
       </div>
@@ -158,11 +171,19 @@
         <button @click="closejy">领取</button>
       </div>
     </div>
+    <div class="login-page" v-show="show==4">
+      <span>使用请扫码：</span>
+      <div class="position-relative">
+        <div class="qrCode my-5" ref="qrCodeDiv"></div>
+        <button @click="close">关闭</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import countTo from 'vue-count-to';
+import QRCode from 'qrcodejs2';
 export default {
   components: { countTo },
   data(){
@@ -177,37 +198,59 @@ export default {
       ty: [],
       sp: [],
       najy:[],
+      sppage:1,
+      sppagecount:0,
+      typage:1,
+      typagecount:0,
+      zchoice:1,
       token:'',
       h: {
         hprice:'100港币',
         hmoney:'85.41人民币',
         hrmb:'85.80人民币'
-      }
+      },
+      h1: {
+        hprice:'1000港币',
+        hmoney:'855.13人民币',
+        hrmb:'855.59人民币'
+      },
+      moredata:1,
+      ma:''
     }
   },
   mounted(){
-    // let mo=document.getElementById("move")
     if(window.name == ""){
-      // console.log("首次被加载");
- 	   // 在首次进入页面时我们给window.name设置一个固定值(isRefresh) 
       window.name = "isRefresh"; 
     }
     else if(window.name == "isRefresh"){
-      // console.log("页面被刷新");
       this.show=0
-      // mo.classList.remove('move')
     }
+    this.getjy()
     this.gethl()
     this.getzx()
-    this.getty()
-    this.getsp()
-    this.getjy()
+    this.getty(this.typage)
+    this.getsp(this.sppage)
   },
   methods:{
+    useyh(){
+      this.show=4
+      this.$nextTick(function(){
+        new QRCode(this.$refs.qrCodeDiv, {
+          text: '使用成功',
+          width: 450,
+          height: 450,
+          colorDark: "#333333", //二维码颜色
+          colorLight: "#ffffff", //二维码背景色
+          correctLevel: QRCode.CorrectLevel.L//容错率，L/M/H
+        })
+      })
+    },
     close () {
       this.show = 0
-      // let move=document.getElementById("move")
-      // console.log(move)
+      this.$refs.qrCodeDiv.innerHTML=""
+    },
+    close1(){
+      this.show=3
     },
     closejy () {
       this.show = 0
@@ -224,27 +267,12 @@ export default {
       }
       this.axios.post("/user/u1/addjy",this.qs.stringify(obj)).then(res=>{
         console.log(res.data)
+      }).catch(e=>{
+        this.$throw(e)
       })
     },
-    hlshow(hl){
-      if(this.$store.state.user){
-        this.h=hl
-        this.show=1
-      }
-      else{
-        this.$confirm('此操作将需要登录, 是否登录?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning',
-          center: true
-        }).then(() =>{
-          window.localStorage.removeItem('token')
-          this.$router.push('/ulog')
-        }).catch(()=>{})
-      }
-    },
     jyshow(){
-      if(this.$store.state.user){
+      if(window.localStorage.getItem('user')){
         if(this.jynum!=0){
           this.show=2,
           this.endVal=Math.ceil(Math.random()*9)  
@@ -265,18 +293,28 @@ export default {
           center: true
         }).then(() =>{
           window.localStorage.removeItem('token')
+          window.localStorage.removeItem('userid')
           this.$router.push('/ulog')
         }).catch(()=>{})
       }
     },
     zxshow(zx){
-      if(this.$store.state.user){
-        this.$confirm('是否领取这张专享券?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-        }).then(() =>{
-          zx.zchoice=1
-        }).catch(()=>{})
+      if(window.localStorage.getItem('user')){
+        if(zx.zchoice==0){
+          this.$confirm('是否领取这张专享券?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+          }).then(() =>{
+            zx.zchoice=this.zchoice
+            let obj={
+              token:this.token,
+              zxid:zx.zid
+            }
+            this.axios.post('/index/addczx',this.qs.stringify(obj)).then(res=>{
+              console.log(res.data)
+            })
+          }).catch(()=>{})
+        }  
       }
       else{
         this.$confirm('此操作将需要登录, 是否登录?', '提示', {
@@ -286,6 +324,7 @@ export default {
           center: true
         }).then(() =>{
           window.localStorage.removeItem('token')
+          window.localStorage.removeItem('userid')
           this.$router.push('/ulog')
         }).catch(()=>{})
       }
@@ -301,6 +340,8 @@ export default {
           this.jynum=0
           this.jy=res.data
         }
+      }).catch(e=>{
+        this.$throw(e)
       })
     },
     gethl(){
@@ -311,25 +352,105 @@ export default {
       })
     },
     getzx(){
-      this.axios.get("/index/getzx").then(res => {
-        this.zx=res.data.res
+      let choice=0
+      this.axios.get('/index/getchoicezx',{
+        params:{
+          token:this.token
+        }
+      }).then(res=>{
+        choice=res.data
+      }).catch(e=>{
+        this.$throw(e)
+      })
+      if(window.localStorage.getItem('userid')%3==0){
+        this.axios.get("/index/getzx").then(res => {
+          this.zx=res.data.res
+          if(!choice){
+            for(let i=0;i<this.zx.length;i++){
+              for(let j=0;j<choice.length;j++){
+                if(this.zx[i].zid==choice[j].zxid){
+                  this.zx[i].zchoice=1
+                }
+              }
+            }
+          }
+        }).catch(e=>{
+          this.$throw(e)
+        })
+      }
+      else{
+        this.axios.get("/index/getzxq").then(res => {
+          this.zx=res.data.res
+          if(!choice){
+            for(let i=0;i<this.zx.length;i++){
+              for(let j=0;j<choice.length;j++){
+                if(this.zx[i].zid==choice[j].zxid){
+                  this.zx[i].zchoice=1
+                }
+              }
+            }
+          }
+        }).catch(e=>{
+          this.$throw(e)
+        })
+      }
+    },
+    getty(typagenum){
+      this.axios.get("/index/getty",{
+        params:{
+          pagenum:typagenum
+        }
+      }).then(res => {
+        this.ty=this.ty.concat(res.data.res)
+        this.typagecount=res.data.count
       }).catch(e=>{
         this.$throw(e)
       })
     },
-    getty(){
-      this.axios.get("/index/getty").then(res => {
-        this.ty=res.data.res
+    getsp(sppagenum){
+      this.axios.get("/index/getsp",{
+        params:{
+          pagenum:sppagenum
+        }
+      }).then(res => {
+        this.sp=this.sp.concat(res.data.res)
+        this.sppagecount=res.data.count
       }).catch(e=>{
         this.$throw(e)
       })
     },
-    getsp(){
-      this.axios.get("/index/getsp").then(res => {
-        this.sp=res.data.res
-      }).catch(e=>{
-        this.$throw(e)
-      })
+    more(){
+      if(window.localStorage.getItem('user')){
+        this.sppage++
+        this.typage++
+        if(this.sppage>this.sppagecount){
+          console.log('没有数据')
+        }
+        else{
+          this.getsp(this.sppage)
+        }
+        if(this.typage>this.typagecount){
+          console.log('object')
+        }
+        else{
+          this.getty(this.typage)
+        }
+        if(this.typage>this.typagecount && this.sppage>this.sppagecount){
+          this.moredata=0
+        }
+      }
+      else{
+        this.$confirm('此操作将需要登录, 是否登录?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+          center: true
+        }).then(() =>{
+          window.localStorage.removeItem('token')
+          window.localStorage.removeItem('userid')
+          this.$router.push('/ulog')
+        }).catch(()=>{})
+      }
     }
   }
 }

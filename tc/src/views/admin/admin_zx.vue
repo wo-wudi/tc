@@ -18,14 +18,16 @@
             <el-button type="primary" size="mini" style="margin-left: 5px" icon="el-icon-circle-plus-outline" @click="add">新增
             </el-button>
           </div>
-          <el-table :data="res" stripe>
+          <el-table :data="results" stripe>
             <el-table-column prop="zid" label="专享券编号">
             </el-table-column>
             <el-table-column prop="zprice" label="价格">
             </el-table-column>
             <el-table-column prop="zname" label="店铺名称">
             </el-table-column>
-             <el-table-column prop="zdl" label="有效期">
+            <el-table-column prop="zdl" label="有效期">
+            </el-table-column>
+            <el-table-column prop="openid" label="新旧券">
             </el-table-column>
             <el-table-column label="编辑" width="100">
               <template slot-scope="scope">
@@ -55,7 +57,7 @@
     <el-dialog
       title="修改"
       :visible.sync="changeVisible" width="30%">
-      <el-form ref="form" label-width="80px">
+      <el-form ref="form" label-width="100px">
         <el-form-item label="编号" style="width:300px">
           <el-input :value="changeForm.zid" disabled></el-input>
         </el-form-item>
@@ -68,16 +70,22 @@
         <el-form-item label="有效期" style="width:300px">
           <el-input v-model="changeForm.zdl" placeholder="请输入修改的有效期"></el-input>
         </el-form-item>
+        <el-form-item label="优惠券类别" style="width:300px">
+          <el-radio-group v-model="radio" @change="change($event)">
+            <el-radio-button :label="0">旧券</el-radio-button>
+            <el-radio-button :label="1">新券</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="changeVisible = false">取 消</el-button>
-        <el-button type="primary" @click="change">修 改</el-button>
+        <el-button type="primary" @click="changedata">修 改</el-button>
       </span>
     </el-dialog>
     <el-dialog
       title="新增"
       :visible.sync="addVisible" width="30%">
-      <el-form ref="form" label-width="80px">
+      <el-form ref="form" label-width="100px">
         <el-form-item label="价格" style="width:300px">
           <el-input v-model="addForm.zprice" placeholder="请输入价格"></el-input>
         </el-form-item>
@@ -86,6 +94,12 @@
         </el-form-item>
         <el-form-item label="有效期" style="width:300px">
           <el-input v-model="addForm.zdl" placeholder="请输入有效期"></el-input>
+        </el-form-item>
+        <el-form-item label="优惠券类别" style="width:300px">
+          <el-radio-group v-model="radio" @change="change($event)">
+            <el-radio-button :label="0">旧券</el-radio-button>
+            <el-radio-button :label="1">新券</el-radio-button>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -108,6 +122,8 @@
 export default {
   data() {
     return {
+      //进行分页操作
+      results:[],
       //保存后台传来的数据
       res:[],
       //保存删除按钮传来的hid的值
@@ -131,7 +147,11 @@ export default {
       //新增窗口弹窗
       addVisible:false,
       //保存新增的值
-      addForm: {}
+      addForm: {},
+      //单选框
+      radio:2,
+      //选择的专享券类别
+      lb:0
     }
   },
   mounted(){
@@ -140,9 +160,20 @@ export default {
   },
   methods:{
     gethl(){
-      this.axios.get("/index/getzx").then(res => {
+      this.axios.get("/admin/g2/getzx").then(res => {
         this.res=res.data.res
-        this.total=this.res.length
+        if(this.res!=0){
+          this.res.forEach(item=>{
+            item.openid = item.openid==1 ? '新券' : '旧券'
+          })
+          this.total=this.res.length
+          let start = (this.pagenum-1)*this.pagesize
+          let end = this.pagenum*this.pagesize
+          this.results=this.res.slice(start,end)
+        }
+        else{
+          this.total=0
+        }
       }).catch(e=>{
         this.$throw(e)
       })
@@ -175,7 +206,8 @@ export default {
       this.changeId=uid
       this.changeVisible=true
     },
-    change(){
+    changedata(){
+      this.changeForm.openid=this.lb
       //将输入的值传入后台进行修改
       this.axios.post("/admin/a2/update",this.qs.stringify(this.changeForm)).then(res => {
         console.log(res.data)
@@ -202,22 +234,29 @@ export default {
         }).then(res => {
           this.res=res.data
           this.total=this.res.length
+          let start = (this.pagenum-1)*this.pagesize
+          let end = this.pagenum*this.pagesize
+          this.results=this.res.slice(start,end)
         }).catch(e=>{
           this.$throw(e)
         })
       }
     },
     handleSizeChange(val) {
-      this.pagesize=val
+      console.log(val)
     },
     //点击下一页或者输入跳转页码时,将新的页码重新传到后台，请求相应页码的数据
-   handleCurrentChange(val){
-     this.getData(this.pagesize,val)
+    handleCurrentChange(val){
+      this.pagenum=val
+      let start = (this.pagenum-1)*this.pagesize
+      let end = this.pagenum*this.pagesize
+      this.results=this.res.slice(start,end)
     },
     add(){
       this.addVisible=true
     },
     addData(){
+      this.addForm.openid=this.lb
       this.axios.post("/admin/a2/add",this.qs.stringify(this.addForm)).then(res => {
         console.log(res.data)
       }).catch(e=>{
@@ -226,6 +265,9 @@ export default {
       //刷新一次页面
       this.$router.go(0)
       this.addVisible=false
+    },
+    change(e){
+      this.lb=e
     }
   },
   watch:{

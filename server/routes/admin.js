@@ -65,6 +65,15 @@ admin.get("/a4/search", (req, res) => {
     res.send(result);
   });
 });
+//3.5.按编号查询境外券
+admin.get("/a5/search", (req, res) => {
+  let _jid = req.query.jid;
+  let sql = "select jid,jprice,username from yhq_jy where jid=?";
+  pool.query(sql, [_jid], (err, result) => {
+    if (err) throw err;
+    res.send(result);
+  });
+});
 //4.1.根据hid删除优惠券
 admin.get("/a1/del", (req, res) => {
   let _hid = req.query.hid;
@@ -105,6 +114,16 @@ admin.get("/a4/del", (req, res) => {
     else res.send("0");
   });
 });
+//4.5 根据jid删除境外券
+admin.get("/a5/del", (req, res) => {
+  let _jid = req.query.jid;
+  let sql = "delete from yhq_jy where jid=?";
+  pool.query(sql, [_jid], (err, result) => {
+    if (err) throw err;
+    if (result.affectedRows > 0) res.send("1");
+    else res.send("0");
+  });
+});
 //5.1.根据hid修改优惠券信息
 admin.post("/a1/update", (req, res) => {
   let _hid = req.body.hid;
@@ -138,7 +157,7 @@ admin.post("/a3/update", (req, res) => {
     else res.send("0");
   });
 });
-//5.4.根据sid修改通用券信息
+//5.4.根据sid修改商铺券信息
 admin.post("/a4/update", (req, res) => {
   let _sid = req.body.sid;
   let obj = req.body;
@@ -161,9 +180,12 @@ admin.post("/a1/add", (req, res) => {
 });
 //6.2.新增专享券
 admin.post("/a2/add", (req, res) => {
-  let obj = req.body;
-  let sql = "insert into yhq_zx set?";
-  pool.query(sql, [obj], (err, result) => {
+  let zname = req.body.zname;
+  let zprice = req.body.zprice;
+  let zdl = req.body.zdl;
+  let openid = req.body.openid;
+  let sql = "insert yhq_zx(zname,zprice,zdl,openid) values(?,?,?,?)";
+  pool.query(sql, [zname, zprice, zdl, openid], (err, result) => {
     if (err) throw err;
     if (result.affectedRows > 0) res.send("1");
     else res.send("0");
@@ -187,6 +209,51 @@ admin.post("/a4/add", (req, res) => {
     if (err) throw err;
     if (result.affectedRows > 0) res.send("1");
     else res.send("0");
+  });
+});
+//7.1查找汇率券
+admin.get("/g1/gethl", (req, res) => {
+  let sql = "select hid,hprice,hmoney,hrmb from yhq_hl";
+  pool.query(sql, (err, result) => {
+    if (err) throw err;
+    if (result.length > 0) res.send({ code: 200, res: result });
+    else res.send({ res: 0 });
+  });
+});
+//7.2查找专享券
+admin.get("/g2/getzx", (req, res) => {
+  let sql = "select zid,zname,zprice,zdl,zchoice,openid from yhq_zx";
+  pool.query(sql, (err, result) => {
+    if (err) throw err;
+    if (result.length > 0) res.send({ code: 200, res: result });
+    else res.send({ res: 0 });
+  });
+});
+//7.3查找通用券
+admin.get("/g3/getty", (req, res) => {
+  let sql = " select tid,tname,tenglish,tprice,tmoney,tuse from yhq_ty";
+  pool.query(sql, (err, result) => {
+    if (err) throw err;
+    if (result.length > 0) res.send({ code: 200, res: result });
+    else res.send({ res: 0 });
+  });
+});
+//7.4查找商铺券
+admin.get("/g4/getsp", (req, res) => {
+  let sql = "select sid,sname,sprice,soldprice from yhq_sp";
+  pool.query(sql, (err, result) => {
+    if (err) throw err;
+    if (result.length > 0) res.send({ code: 200, res: result });
+    else res.send({ res: 0 });
+  });
+});
+//7.5查找境外券
+admin.get("/g5/getjy", (req, res) => {
+  let sql = "select jid,jprice,username from yhq_jy";
+  pool.query(sql, (err, result) => {
+    if (err) throw err;
+    if (result.length > 0) res.send({ code: 200, res: result });
+    else res.send({ res: 0 });
   });
 });
 //导出路由器对象

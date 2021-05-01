@@ -45,11 +45,19 @@ create table yhq_zx(
   zname varchar(24) NOT NULL comment '店铺名称',
   zprice varchar(8) NOT NULL comment '专享价格',
   zdl varchar(16) NOT NULL  comment '有效期',
-  zchoice int unsigned NOT NULL default 0 comment '是否被领取，0 - 未领取 1 - 已领取'
+  zchoice int unsigned NOT NULL default 0 comment '未领取',
+  openid int unsigned NOT NULL default 0 comment '新券标识'
 );
-insert into yhq_zx values(1,'屈臣氏','20元','21天内有效',0);
-insert into yhq_zx values(2,'香奈儿','30元','24天内有效',0);
-insert into yhq_zx values(3,'热风','50元','18天内有效',0);
+insert into yhq_zx values(1,'屈臣氏','20元','21天内有效',default,default);
+insert into yhq_zx values(2,'香奈儿','30元','24天内有效',default,default);
+insert into yhq_zx values(3,'热风','50元','18天内有效',default,1);
+#丢弃表如果存在
+drop table if exists yhq_choicezx;
+create table yhq_choicezx(
+  cid int unsigned primary key auto_increment,
+  usename varchar(12) comment '用户名',
+  zxid int unsigned NOT NULL comment '外键,专享券id'
+);
 #丢弃表如果存在
 drop table if exists yhq_jy;
 #创建境外通用券表
@@ -75,6 +83,18 @@ insert into yhq_ty values(3,'精美礼品券','Designer Trend',0,'','满300港�
 insert into yhq_ty values(4,'全场通用券','Petit Bateau',40,'港币','满150港币可用');
 insert into yhq_ty values(5,'新品折扣券','Hallmork Babies',9,'折','满100港币可用');
 insert into yhq_ty values(6,'精美礼品券','Designer Trend',0,'','满200港币可用');
+insert into yhq_ty values(7,'全场通用券','Petit Bateau',20,'港币','满100港币可用');
+insert into yhq_ty values(8,'新品折扣券','Hallmork Babies',8,'折','满500港币可用');
+insert into yhq_ty values(9,'精美礼品券','Designer Trend',0,'','满300港币可用');
+insert into yhq_ty values(10,'全场通用券','Petit Bateau',40,'港币','满150港币可用');
+insert into yhq_ty values(11,'新品折扣券','Hallmork Babies',9,'折','满100港币可用');
+insert into yhq_ty values(12,'精美礼品券','Designer Trend',0,'','满200港币可用');
+insert into yhq_ty values(13,'全场通用券','Petit Bateau',20,'港币','满100港币可用');
+insert into yhq_ty values(14,'新品折扣券','Hallmork Babies',8,'折','满500港币可用');
+insert into yhq_ty values(15,'精美礼品券','Designer Trend',0,'','满300港币可用');
+insert into yhq_ty values(16,'全场通用券','Petit Bateau',40,'港币','满150港币可用');
+insert into yhq_ty values(17,'新品折扣券','Hallmork Babies',9,'折','满100港币可用');
+insert into yhq_ty values(18,'精美礼品券','Designer Trend',0,'','满200港币可用');
 #丢弃表如果存在
 drop table if exists yhq_sp;
 #创建商品券表
@@ -87,3 +107,8 @@ create table yhq_sp(
 insert into yhq_sp values(1,'桌上吸尘器',80,85);
 insert into yhq_sp values(2,'扫地机器人',90,92);
 insert into yhq_sp values(3,'窗户清洁剂',43,48);
+insert into yhq_sp values(4,'桌上吸尘器',80,85);
+insert into yhq_sp values(5,'扫地机器人',90,92);
+insert into yhq_sp values(6,'窗户清洁剂',43,48);
+insert into yhq_sp values(7,'桌上吸尘器',80,85);
+insert into yhq_sp values(8,'扫地机器人',90,92);

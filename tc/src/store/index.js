@@ -11,10 +11,22 @@ export default new Vuex.Store({
     user: localStorage.getItem("user")
       ? JSON.parse(localStorage.getItem("user"))
       : {},
+    userid: localStorage.getItem("userid")
+      ? JSON.parse(localStorage.getItem("userid"))
+      : {},
+    admin: localStorage.getItem("admin")
+      ? JSON.parse(localStorage.getItem("admin"))
+      : {},
   },
   mutations: {
+    addAdmin(state, payload) {
+      state.admin = payload;
+    },
     addUser(state, payload) {
       state.user = payload;
+    },
+    addUserID(state, payload) {
+      state.userid = payload;
     },
     addToken(state, payload) {
       state.token = payload;

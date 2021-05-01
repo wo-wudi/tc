@@ -18,7 +18,7 @@
             <el-button type="primary" size="mini" style="margin-left: 5px" icon="el-icon-circle-plus-outline" @click="add">新增
             </el-button>
           </div>
-          <el-table :data="res" stripe>
+          <el-table :data="results" stripe>
             <el-table-column prop="hid" label="汇率券编号">
             </el-table-column>
             <el-table-column prop="hprice" label="币值">
@@ -108,6 +108,8 @@
 export default {
   data() {
     return {
+      //进行分页操作
+      results:[],
       //保存后台传来的数据
       res:[],
       //保存删除按钮传来的hid的值
@@ -140,9 +142,17 @@ export default {
   },
   methods:{
     gethl(){
-      this.axios.get("/index/gethl").then(res => {
+      this.axios.get("/admin/g1/gethl").then(res => {
         this.res=res.data.res
-        this.total=this.res.length
+        if(this.res!=0){
+          this.total=this.res.length
+          let start = (this.pagenum-1)*this.pagesize
+          let end = this.pagenum*this.pagesize
+          this.results=this.res.slice(start,end)
+        }
+        else{
+          this.total=0
+        }
       }).catch(e=>{
         this.$throw(e)
       })
@@ -201,18 +211,24 @@ export default {
           }
         }).then(res => {
           this.res=res.data
-          this.total=this.res.length
+          this.total=res.data.length
+          let start = (this.pagenum-1)*this.pagesize
+          let end = this.pagenum*this.pagesize
+          this.results=this.res.slice(start,end)
         }).catch(e=>{
           this.$throw(e)
         })
       }
     },
     handleSizeChange(val) {
-      this.pagesize=val
+      console.log(val)
     },
     //点击下一页或者输入跳转页码时,将新的页码重新传到后台，请求相应页码的数据
-   handleCurrentChange(val){
-     this.getData(this.pagesize,val)
+    handleCurrentChange(val){
+      this.pagenum=val
+      let start = (this.pagenum-1)*this.pagesize
+      let end = this.pagenum*this.pagesize
+      this.results=this.res.slice(start,end)
     },
     add(){
       this.addVisible=true

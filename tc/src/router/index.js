@@ -65,6 +65,11 @@ const routes = [
         component: () =>
           import(/* webpackChunkName: "asp" */ "../views/admin/admin_sp.vue"),
       },
+      {
+        path: "/ajy",
+        component: () =>
+          import(/* webpackChunkName: "ajy" */ "../views/admin/admin_jy.vue"),
+      },
     ],
   },
 ];

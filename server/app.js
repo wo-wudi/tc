@@ -4,10 +4,14 @@ var path = require("path");
 //引入cookieParser模块
 var cookieParser = require("cookie-parser");
 //引入compression模块
+// const socketIO = require("socket.io");
 const compression = require("compression");
 var logger = require("morgan");
+// const http = require("http");
+
 //加载cors模块
 const cors = require("cors");
+//加载socket.io模块
 
 //引入路由对象
 const indexRouter = require("./routes/index");
@@ -15,6 +19,18 @@ const userRouter = require("./routes/user");
 const adminRouter = require("./routes/admin");
 
 var app = express();
+// const server = http.createServer(app);
+// const io = socketIO(server, {
+//   cors: {
+//     origin: "*",
+//   },
+// });
+// io.on("connection", (socket) => {
+//   console.log("user connected");
+//   socket.on("hello", (data) => {
+//     console.log(`收到客户端的消息：${data}`);
+//   });
+// });
 //跨域处理
 app.use(
   cors({
@@ -22,6 +38,12 @@ app.use(
     credentials: true,
   })
 );
+
+// app.get("/", (req, res) => {
+//   io.emit("message", "服务端向客户端推送消息...");
+//   res.writeHead(200, { "Content-type": "text/plain" });
+//   res.end();
+// });
 app.use(compression());
 // view engine setup
 // app.set("views", path.join(__dirname, "views"));

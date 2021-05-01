@@ -10,7 +10,7 @@
               <el-dropdown-item><span @click="quit">注销</span></el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
-          <span>ranran&nbsp;欢迎您！</span>
+          <span>{{this.$store.state.admin}}&nbsp;欢迎您！</span>
         </div>
       </el-header>
       <el-container>
@@ -23,6 +23,7 @@
                 <el-menu-item index="1-2" @click="azx">专享券管理</el-menu-item>
                 <el-menu-item index="1-3" @click="aty">通用券管理</el-menu-item>
                 <el-menu-item index="1-4" @click="asp">商铺券管理</el-menu-item>
+                <el-menu-item index="1-5" @click="ajy">境外券管理</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
           </el-menu>
@@ -56,6 +57,7 @@ export default {
     },
     close(){
       this.$router.push('/alog')
+      window.localStorage.removeItem('admin')
     },
     ahl(){
       this.$router.push('/ahl')
@@ -68,6 +70,9 @@ export default {
     },
     asp(){
       this.$router.push('/asp')
+    },
+    ajy(){
+      this.$router.push('/ajy')
     }
   }
 }
